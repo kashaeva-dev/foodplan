@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class MealType(models.Model):
@@ -76,6 +77,7 @@ class Recipe(models.Model):
                                   related_name='recipes',
                                   through='MealTypeRecipe',
                                   )
+    people = models.IntegerField(verbose_name='Количество порций', default=1)
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -84,9 +86,20 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    def total_calories(self):
-        return sum([ingredient.quantity * (ingredient.ingredient.energy / 100)
-                    for ingredient in self.ingredients.all()])
+    def get_total_weight_per_person(self):
+        return sum([ingredient_item.quantity
+             for ingredient_item in self.recipe_ingredients.all()]) / self.people
+
+    def get_total_calories(self):
+        return sum([ingredient_item.quantity * (ingredient_item.ingredient.energy / 100)
+                    for ingredient_item in self.recipe_ingredients.all()])
+
+    def get_total_calories_per_100(self):
+        return self.get_total_calories() / sum([ingredient_item.quantity
+                                                for ingredient_item in self.recipe_ingredients.all()])
+
+    def get_total_calories_per_person(self):
+        return self.get_total_calories() / self.people
 
 
 class RecipeIngredient(models.Model):
@@ -148,3 +161,58 @@ class MenuTypeRecipe(models.Model):
 
     def __str__(self):
         return f'{self.menu_type} - {self.recipe}'
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.PROTECT,
+                             verbose_name='Пользователь',
+                             related_name='subscriptions',
+                             )
+    menu_type = models.ForeignKey(MenuType,
+                                  on_delete=models.PROTECT,
+                                  verbose_name='Тип меню',
+                                  related_name='subscriptions',
+                                  )
+    people_quantity = models.IntegerField(verbose_name='Количество персон')
+    meal_type = models.ManyToManyField(MealType,
+                                       verbose_name='Тип блюда',
+                                       related_name='subscriptions',
+                                       through='SubscriptionMealType',
+                                       )
+    total_price = models.DecimalField(max_digits=8,
+                                      decimal_places=2,
+                                      verbose_name='Стоимость, руб.',
+                                      )
+    start_date = models.DateField(verbose_name='Дата начала')
+    end_date = models.DateField(verbose_name='Дата окончания')
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
+    def __str__(self):
+        return f'{self.user}: {self.start_date} - {self.end_date}'
+
+    def get_recipes(self):
+        return self.menu_type.recipes.all()
+
+
+class SubscriptionMealType(models.Model):
+    subscription = models.ForeignKey(Subscription,
+                                     on_delete=models.PROTECT,
+                                     verbose_name='Подписка',
+                                     related_name='subscription_meal_types',
+                                     )
+    meal_type = models.ForeignKey(MealType,
+                                  on_delete=models.PROTECT,
+                                  verbose_name='Тип блюда',
+                                  related_name='subscription_meal_types',
+                                  )
+
+    class Meta:
+        verbose_name = 'Тип блюда подписки'
+        verbose_name_plural = 'Типы блюд подписки'
+
+    def __str__(self):
+        return f'{self.subscription} - {self.meal_type}'

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from foodplan.models import MealType, Allergy, Ingredient, MenuType, Recipe, RecipeIngredient, MealTypeRecipe, \
-    MenuTypeRecipe
+    MenuTypeRecipe, SubscriptionMealType, Subscription
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -21,12 +21,34 @@ class MenuTypeRecipeInline(admin.TabularInline):
     extra = 1
 
 
+class SubscriptionMealTypeInline(admin.TabularInline):
+    model = SubscriptionMealType
+    extra = 1
+
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    inlines = (SubscriptionMealTypeInline,)
+
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     inlines = (RecipeIngredientInline,
                MealTypeRecipeInline,
                MenuTypeRecipeInline,
                )
+    list_display = ('name',
+                    'total_calories_per_person_display',
+                    'total_weight_per_person_display',
+                    )
+
+    def total_calories_per_person_display(self, obj):
+        return int(obj.get_total_calories_per_person())
+    total_calories_per_person_display.short_description = 'Калории на порцию'
+
+    def total_weight_per_person_display(self, obj):
+        return int(obj.get_total_weight_per_person())
+    total_weight_per_person_display.short_description = 'Вес порции, г'
 
 
 @admin.register(MenuType)

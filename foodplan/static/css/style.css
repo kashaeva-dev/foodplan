@@ -245,3 +245,37 @@ body {
         background-color: #91B93E;
     }
 }
+.menu-row__container {
+    border-bottom: 1px solid #91B93E;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.menu-type__header {
+    color: #91B93E;
+
+}
+
+.menu-type__container {
+    display: flex;
+    align-items: center;
+}
+
+.recipe__photo_previw {
+    border-radius: 5px;
+}
+
+.recipe__control-panel {
+    display: flex;
+    justify-content: end;
+    gap: 10px;
+    align-items: center;
+}
+.align-items-center {
+    align-items: center;
+}
+.color-green {
+    color: #91B93E;
+}
+.color-red {
+    color: #fe9700;
+}

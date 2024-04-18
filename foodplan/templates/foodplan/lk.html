@@ -33,15 +33,21 @@
                 <div class="card col-12 col-md-10 p-3 mb-3 foodplan__shadow">
                         <ul class="nav nav-tabs">
                             <li class="nav-item foodplan__tab-item">
-                                <button id="tab1" class="btn shadow-none foodplan__tab-button active" data-bs-toggle="tab" data-bs-target="#data">Персональные данные</button>
+                                <button id="tab1" class="btn shadow-none foodplan__tab-button active" data-bs-toggle="tab" data-bs-target="#recipe">Рецепты на сегодня</button>
                             </li>
                             <li class="nav-item foodplan__tab-item">
-                                <button id="tab2" class="btn shadow-none foodplan__tab-button" data-bs-toggle="tab" data-bs-target="#menu">Моё меню</button>
+                                <button id="tab2" class="btn shadow-none foodplan__tab-button" data-bs-toggle="tab" data-bs-target="#list">Список покупок</button>
+                            </li>
+                            <li class="nav-item foodplan__tab-item">
+                                <button id="tab3" class="btn shadow-none foodplan__tab-button" data-bs-toggle="tab" data-bs-target="#menu">Моё меню</button>
+                            </li>
+                            <li class="nav-item foodplan__tab-item">
+                                <button id="tab4" class="btn shadow-none foodplan__tab-button" data-bs-toggle="tab" data-bs-target="#data">Персональные данные</button>
                             </li>
                             <li class="nav-item foodplan__tab-item flex-grow-1"></li>
                         </ul>
                         <div class="tab-content mt-2">
-                            <div class="tab-pane fade show active" id="data">
+                            <div class="tab-pane fade" id="data">
                                 <form action="">
                                     <div class="mb-3">
                                         <div class="d-flex align-items-center justify-content-between">
@@ -90,6 +96,7 @@
                                                     necessitatibus consectetur rem! Eligendi
                                                     assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae distinctio cum laboriosam
                                                     sed.</h6>
+
                                             </div>
                                             <div class="col-md-12 col-lg-3 text-muted d-flex flex-column justify-content-between">
                                                 <div class="d-flex flex-row justify-content-between">
@@ -110,6 +117,123 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="tab-pane fade" id="list">
+                                <div class="col-12 col-sm-6 p-3">
+                                    <small class="link-secondary">Ингредиенты:</small>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
+                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
+                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
+                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
+                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade show active" id="recipe">
+                                <div class="row menu-row__container p-3">
+                                    <div class="col-8">
+                                        <div class="row">
+                                            <h3 class="menu-type__header">Завтрак</h3>
+                                        </div>
+                                        <h3>Название блюда 1</h3>
+                                        <p>Описание блюда Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis necessitatibus
+                                            consectetur rem! Eligendi assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae
+                                            distinctio cum laboriosam sed. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis
+                                            necessitatibus consectetur rem! Eligendi
+                                            assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae distinctio cum laboriosam
+                                            sed.
+                                        </p>
+                                        <p class="text-muted"><img src="{% static 'img/menu_classical.png' %}" style="max-width: 50px;" alt="" class="w-30"> Классическое меню</p>
+                                    </div>
+                                    <div class="col-4 text-muted d-flex flex-column justify-content-between">
+                                        <div class="d-flex flex-row justify-content-between">
+                                            <img src="{% static 'img/1.jpg' %}" alt="recipe_photo" class="w-100 recipe__photo_previw">
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <div class="recipe__control-panel">
+                                                <i class="fa fa-heart-o color-green" aria-hidden="true"></i>
+                                                <i class="fa fa-thumbs-o-down color-red" aria-hidden="true"></i>
+                                                <i class="fa fa-refresh color-green" aria-hidden="true"></i>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-users color-green" aria-hidden="true"></i> <small class="text-muted">6</small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-row justify-content-between mb-3">
+                                            <small>Ингридиенты: </small>
+                                        </div>
+                                        <div class="ingredients-container">
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <small>Картофель: </small><small>550 гр</small>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <small>Морковь: </small><small>100 гр</small>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <small>Масло растительное: </small><small>20 гр</small>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <small>Соль: </small><small>по вкусу</small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-row justify-content-between mt-3">
+                                            <small>Калорийность 1 порции: </small><small>250 ккал</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row menu-row__container p-3">
+                                    <div class="col-8">
+                                        <div class="row">
+                                            <h3 class="menu-type__header">Обед</h3>
+                                        </div>
+                                        <h3>Название блюда 2</h3>
+                                        <p>Описание блюда Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis necessitatibus
+                                            consectetur rem! Eligendi assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae
+                                            distinctio cum laboriosam sed. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis
+                                            necessitatibus consectetur rem! Eligendi
+                                            assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae distinctio cum laboriosam
+                                            sed.
+                                        </p>
+                                        <p class="text-muted"><img src="{% static 'img/menu_classical.png' %}" style="max-width: 50px;" alt="" class="w-30"> Классическое меню</p>
+                                    </div>
+                                    <div class="col-4 text-muted d-flex flex-column justify-content-between">
+                                        <div class="d-flex flex-row justify-content-between">
+                                            <img src="{% static 'img/1.jpg' %}" alt="recipe_photo" class="w-100 recipe__photo_previw">
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <div class="recipe__control-panel">
+                                                <i class="fa fa-heart-o color-green" aria-hidden="true"></i>
+                                                <i class="fa fa-thumbs-o-down color-red" aria-hidden="true"></i>
+                                                <i class="fa fa-refresh color-green" aria-hidden="true"></i>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-users color-green" aria-hidden="true"></i> <small class="text-muted">6</small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-row justify-content-between mb-3">
+                                            <small>Ингридиенты: </small>
+                                        </div>
+                                        <div class="ingredients-container">
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <small>Картофель: </small><small>550 гр</small>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <small>Морковь: </small><small>100 гр</small>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <small>Масло растительное: </small><small>20 гр</small>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <small>Соль: </small><small>по вкусу</small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-row justify-content-between mt-3">
+                                            <small>Калорийность 1 порции: </small><small>250 ккал</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
                 </div>
