@@ -1,22 +1,18 @@
+from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
-from account.forms import RegistrationUserForm
+from account.forms import RegistrationUserForm, AuthorizationUserForm
 
 
 class RegistrationUser(CreateView):
     form_class = RegistrationUserForm
     template_name = 'foodplan/registration.html'
     success_url = reverse_lazy("account:auth")
-# def register_user(request):
-#     form = None
-#     if request.method == 'POST':
-#         form = RegistrationUserForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.set_password(form.cleaned_data["password"])
-#             user.save()
-#             return render(request, 'foodplan/registration_done.html')
-#     elif request.method == 'GET':
-#         form = RegistrationUserForm()
-#     return render(request, 'foodplan/registration.html', {'form': form})
+
+
+class LoginUser(LoginView):
+    form_class = AuthorizationUserForm
+    template_name = 'foodplan/auth.html'
+
+
