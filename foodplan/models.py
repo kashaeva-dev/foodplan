@@ -242,3 +242,43 @@ class SubscriptionAllergy(models.Model):
 
     def __str__(self):
         return f'{self.subscription} - {self.allergy}'
+
+
+class UserRecipe(models.Model):
+    REACTION_CHOICES = (
+        ('like', 'Нравится'),
+        ('dislike', 'Не нравится'),
+        ('neutral', 'Нейтрально'),
+    )
+    date = models.DateField(verbose_name='Дата')
+    subscription = models.ForeignKey(Subscription,
+                                        on_delete=models.PROTECT,
+                                        verbose_name='Подписка',
+                                        related_name='user_recipes',
+                                        )
+    meal_type = models.ForeignKey(MealType,
+                                  on_delete=models.PROTECT,
+                                  verbose_name='Тип блюда',
+                                  related_name='user_recipes',
+                                  )
+    multiplier = models.IntegerField(verbose_name='Множитель', default=1)
+    attempt = models.IntegerField(verbose_name='Попытка', default=1)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.PROTECT,
+                             verbose_name='Пользователь',
+                             related_name='user_recipes',
+                             )
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.PROTECT,
+                               verbose_name='Рецепт',
+                               related_name='user_recipes',
+                               )
+    reaction = models.CharField(max_length=7, verbose_name='Реакция', choices=REACTION_CHOICES, default='neutral')
+    is_valid = models.BooleanField(verbose_name='Действует', default=True)
+
+    class Meta:
+        verbose_name = 'Рецепт пользователя'
+        verbose_name_plural = 'Рецепты пользователей по дням'
+
+    def __str__(self):
+        return f'{self.user} - {self.recipe}'
