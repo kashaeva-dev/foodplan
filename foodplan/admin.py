@@ -70,6 +70,7 @@ class MenuTypeAdmin(admin.ModelAdmin):
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ['name', 'protein', 'fat', 'carbohydrate', 'energy', 'allergy']
+    list_editable = ['protein', 'fat', 'carbohydrate', 'energy', 'allergy']
     list_filter = ['allergy']
     search_fields = ['name']
     ordering = ['name']
