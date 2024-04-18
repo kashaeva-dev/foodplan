@@ -49,6 +49,7 @@ class Ingredient(models.Model):
 class MenuType(models.Model):
     name = models.CharField(max_length=40, verbose_name='Тип меню')
     image = models.ImageField(verbose_name='Изображение', upload_to='diets')
+    description = models.TextField(verbose_name='Описание', blank=True)
 
     class Meta:
         verbose_name = 'Тип меню'
@@ -180,6 +181,11 @@ class Subscription(models.Model):
                                        related_name='subscriptions',
                                        through='SubscriptionMealType',
                                        )
+    allergies = models.ManyToManyField(Allergy,
+                                     verbose_name='Аллергия',
+                                     related_name='subscriptions',
+                                     through='SubscriptionAllergy',
+                                     )
     total_price = models.DecimalField(max_digits=8,
                                       decimal_places=2,
                                       verbose_name='Стоимость, руб.',
@@ -216,3 +222,23 @@ class SubscriptionMealType(models.Model):
 
     def __str__(self):
         return f'{self.subscription} - {self.meal_type}'
+
+
+class SubscriptionAllergy(models.Model):
+    subscription = models.ForeignKey(Subscription,
+                                     on_delete=models.PROTECT,
+                                     verbose_name='Подписка',
+                                     related_name='subscription_allergies',
+                                     )
+    allergy = models.ForeignKey(Allergy,
+                                on_delete=models.PROTECT,
+                                verbose_name='Аллергия',
+                                related_name='subscription_allergies',
+                                )
+
+    class Meta:
+        verbose_name = 'Аллергия в подписке'
+        verbose_name_plural = 'Аллергии в подписке'
+
+    def __str__(self):
+        return f'{self.subscription} - {self.allergy}'

@@ -20,11 +20,11 @@
 
                 <div class="card col-12 col-md-2 p-3 mb-3 d-flex flex-column align-items-center foodplan__shadow">
                     <div class="position-relative">
-                        <img src="img/test_avatar.png" alt="" width="100" height="100" class="rounded-pill">
+                        <img src="{% static 'img/test_avatar.png' %}" alt="" width="100" height="100" class="rounded-pill">
                         <span class="badge rounded-circle position-absolute bottom-0 end-0 foodplan__bg_green avatar__plus"><a href="#"
                                 class="link-dark text-decoration-none align-middle">+</a></span>
                     </div>
-                    <h3 class="card-title text-center">Tim</h3>
+                    <h3 class="card-title text-center">{{ username }}</h3>
                     <div class="d-block">
                         <button class="btn btn-outline-success shadow-none foodplan_green foodplan__border_green">Выйти</button>
                     </div>
@@ -32,14 +32,16 @@
 
                 <div class="card col-12 col-md-10 p-3 mb-3 foodplan__shadow">
                         <ul class="nav nav-tabs">
+                            {% if active_subscriptions %}
+                                <li class="nav-item foodplan__tab-item">
+                                    <button id="tab1" class="btn shadow-none foodplan__tab-button {% if active_subscriptions %} active {% endif %}" data-bs-toggle="tab" data-bs-target="#recipe">Рецепты на сегодня</button>
+                                </li>
+                                <li class="nav-item foodplan__tab-item">
+                                    <button id="tab2" class="btn shadow-none foodplan__tab-button" data-bs-toggle="tab" data-bs-target="#list">Список покупок</button>
+                                </li>
+                            {% endif %}
                             <li class="nav-item foodplan__tab-item">
-                                <button id="tab1" class="btn shadow-none foodplan__tab-button active" data-bs-toggle="tab" data-bs-target="#recipe">Рецепты на сегодня</button>
-                            </li>
-                            <li class="nav-item foodplan__tab-item">
-                                <button id="tab2" class="btn shadow-none foodplan__tab-button" data-bs-toggle="tab" data-bs-target="#list">Список покупок</button>
-                            </li>
-                            <li class="nav-item foodplan__tab-item">
-                                <button id="tab3" class="btn shadow-none foodplan__tab-button" data-bs-toggle="tab" data-bs-target="#menu">Моё меню</button>
+                                <button id="tab3" class="btn shadow-none foodplan__tab-button {% if not active_subscriptions %} active {% endif %}" data-bs-toggle="tab" data-bs-target="#menu">Моё меню</button>
                             </li>
                             <li class="nav-item foodplan__tab-item">
                                 <button id="tab4" class="btn shadow-none foodplan__tab-button" data-bs-toggle="tab" data-bs-target="#data">Персональные данные</button>
@@ -79,45 +81,74 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="tab-pane fade" id="menu">
-                                <div class="row">
-                                    <div class="col-2">
-                                        <img src="img/circle1.png" alt="" class="w-100">
+                            <div class="tab-pane fade {% if not active_subscriptions %} show active {% endif %}" id="menu">
+                                {% if active_subscriptions %}
+                                    <div class="d-flex flex-column align-items-flex-end">
+                                        <div class="d-block">
+                                            <button class="btn btn-outline-success shadow-none foodplan_green foodplan__border_green">Новая подписка</button>
+                                        </div>
                                     </div>
-                                    <div class="col-10 col-md-10">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h2>Название подписки</h2>
-                                            </div>
-                                            <div class="col-md-12 col-lg-9">
-                                                <h6>Описание подписки Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis necessitatibus
-                                                    consectetur rem! Eligendi assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae
-                                                    distinctio cum laboriosam sed. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis
-                                                    necessitatibus consectetur rem! Eligendi
-                                                    assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae distinctio cum laboriosam
-                                                    sed.</h6>
-
-                                            </div>
-                                            <div class="col-md-12 col-lg-3 text-muted d-flex flex-column justify-content-between">
-                                                <div class="d-flex flex-row justify-content-between">
-                                                    <small>Персоны: </small><small>3</small>
-                                                </div>
-                                                <div class="d-flex flex-row justify-content-between">
-                                                    <small>Аллергии: </small><small>нет</small>
-                                                </div>
-                                                <div class="d-flex flex-row justify-content-between">
-                                                    <small>Калории: </small><small>1400</small>
-                                                </div>
-                                                <div class="d-flex flex-row justify-content-between">
-                                                    <small>Кол-во приёмов пищи: </small><small>4</small>
-                                                </div>
-
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-12 subscription-message">
+                                            <br>
+                                            <p>У вас нет активных подписок. </p>
+                                            <p>Вы можете оформить подписку, нажав на соответствующую кнопку ниже.</p>
+                                            <p>Будем рады видеть Вас среди наших клиентов!</p>
+                                            <div class="d-block">
+                                                <button class="btn btn-outline-success shadow-none foodplan_green foodplan__border_green">Подписка</button>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                {% endif %}
+                                {% for subscription in active_subscriptions %}
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h2>{{ subscription.menu_type.name }} меню - до {{ subscription.end_date|date:"d.m.Y"}}</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <img src="{{ subscription.menu_type.image.url }}" alt="" class="w-100">
+                                        </div>
+                                        <div class="col-10 col-md-10">
+                                            <div class="row">
+                                                <div class="col-md-12 col-lg-8">
+                                                    <h6>{{ subscription.menu_type.description }}</h6>
+                                                </div>
+                                                <div class="col-md-12 col-lg-4 text-muted d-flex flex-column justify-content-between">
+                                                    <div class="d-flex flex-row justify-content-between">
+                                                        <small>Персоны: </small><small>{{ subscription.people_quantity }}</small>
+                                                    </div>
+                                                    <div class="d-flex flex-row justify-content-between">
+                                                        <small>Аллергии: </small>
+                                                        <div class="d-flex flex-column align-items-flex-end">
+                                                            {% if subscription.allergies %}
+                                                                {% for allergy in subscription.allergies.all %}
+                                                                    <small>{{ allergy.name }}</small>
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                <small>нет</small>
+                                                            {% endif %}
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="d-flex flex-row justify-content-between">
+                                                        <small>Приёмы пищи: </small>
+                                                        <div class="d-flex flex-column align-items-flex-end">
+                                                            {% for meal_type in subscription.meal_type.all %}
+                                                                <small>{{ meal_type.name }}</small>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
-                            <div class="tab-pane fade" id="list">
+                            {% if active_subscriptions %}
+                                <div class="tab-pane fade" id="list">
                                 <div class="col-12 col-sm-6 p-3">
                                     <small class="link-secondary">Ингредиенты:</small>
                                     <ul class="list-group list-group-flush">
@@ -129,7 +160,7 @@
                                     </ul>
                                 </div>
                             </div>
-                            <div class="tab-pane fade show active" id="recipe">
+                                <div class="tab-pane fade show active" id="recipe">
                                 <div class="row menu-row__container p-3">
                                     <div class="col-8">
                                         <div class="row">
@@ -233,7 +264,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            {% endif %}
                         </div>
 
                 </div>

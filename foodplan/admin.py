@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from foodplan.models import MealType, Allergy, Ingredient, MenuType, Recipe, RecipeIngredient, MealTypeRecipe, \
-    MenuTypeRecipe, SubscriptionMealType, Subscription
+    MenuTypeRecipe, SubscriptionMealType, Subscription, SubscriptionAllergy
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -26,9 +26,16 @@ class SubscriptionMealTypeInline(admin.TabularInline):
     extra = 1
 
 
+class SubscriptionAllergyInline(admin.TabularInline):
+    model = SubscriptionAllergy
+    extra = 1
+
+
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    inlines = (SubscriptionMealTypeInline,)
+    inlines = (SubscriptionMealTypeInline,
+               SubscriptionAllergyInline,
+               )
 
 
 @admin.register(Recipe)
@@ -53,7 +60,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(MenuType)
 class MenuTypeAdmin(admin.ModelAdmin):
-    list_display = [ 'name', 'preview', ]
+    list_display = [ 'name', 'preview', 'description', ]
     readonly_fields = ['preview', ]
 
     def preview(self, obj):
