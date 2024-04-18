@@ -17,11 +17,13 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.shortcuts import render
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('foodplan.urls')),
+    path('', render, kwargs={"template_name": "foodplan/index.html"}, name='start_page'),
+    path('account/', include('account.urls', namespace='account')),
 ]
 
 if settings.DEBUG:
