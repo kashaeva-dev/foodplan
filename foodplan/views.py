@@ -112,6 +112,27 @@ def lk(request):
                   }
                   )
 
+
+def recipe(request):
+    rnd = int(random.random() * Recipe.objects.count() + .5)
+    recipe_id = int(request.GET.get('recipe', rnd))
+    recipe = Recipe.objects.get(pk=recipe_id)
+    ingredients = recipe.recipe_ingredients.values_list(
+        'quantity', 'ingredient__name', 'ingredient__energy'
+    )
+    total_energy = 0
+    for  _, _, energy in ingredients:
+        total_energy += energy
+    context = {
+        'name': recipe.name,
+        'description': recipe.description,
+        'image': recipe.image.url,
+        'ingredients': ingredients,
+        'total_energy': total_energy,
+    }
+    return render(request, 'foodplan/card3.html', context = context)
+
+
 @login_required
 def subscription(request):
     return render(request, 'foodplan/order.html',)
