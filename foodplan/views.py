@@ -1,24 +1,47 @@
 import datetime
 import json
 import random
+import uuid
 
-
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.shortcuts import render, redirect 
-from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.forms.models import model_to_dict
+from yookassa import Configuration, Payment
 
-from .models import Subscription, MenuType, MealType, Allergy
-
-from foodplan.models import Subscription, SubscriptionMealType, Recipe, UserRecipe
+from foodplan.models import Subscription, Recipe, UserRecipe
+from .models import MenuType, MealType, Allergy
 from .serializers import UserRecipeSerializer
+
+
+def get_payment(subscription_id, sum):
+    Configuration.account_id = settings.YOOKASSA_SHOP_ID
+    Configuration.secret_key = settings.YOOKASSA_API_KEY
+
+    payment = Payment.create({
+        "amount": {
+            "value": sum,
+            "currency": "RUB"
+        },
+        "confirmation": {
+            "type": "redirect",
+            "return_url": "https://foodplan.alexwolf.ru/lk_test/"
+        },
+        "capture": True,
+        "description": f"Order №{subscription_id}"
+    }, uuid.uuid4())
+    return payment
+
+
+@csrf_exempt
+@api_view(['POST',])
+def answer_yookassa(request):
+    return Response(status=status.HTTP_200_OK)
 
 
 def index(request):
@@ -105,7 +128,7 @@ def create_subscription(request):
 
     if ((period < 1) or (menu_type not in range(1, 5)) or (not meals)
         or (persons < 1)):
-        return redirect('subscription')
+        return redirect({'Error': 'Wrong data input'})
     
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=period*30)
@@ -113,21 +136,24 @@ def create_subscription(request):
         user=request.user,
         menu_type=MenuType.objects.get(pk=menu_type),
         people_quantity=persons,
-        total_price=(meals*10+65)*persons,
+        total_price=(meals*10+65)*period,
         start_date=start_date,
         end_date=end_date,
     )
-    if (created):
-        for meal_pk, value in enumerate(meal_types):
-            if value:
-                meal = MealType.objects.get(pk=meal_pk+1)
-                subscription.meal_type.add(meal)
-        for allergy_pk, value in enumerate(allergy_types):
-            if value:
-                allergy = Allergy.objects.get(pk=allergy_pk+1)
-                subscription.allergies.add(allergy)
+    if not created:
+        return redirect({'Error': 'Not created'})
 
-    return Response({'status': f"{period < 1} {menu_type not in range(1, 5)} {meals} {persons < 1}"})
+    for meal_pk, value in enumerate(meal_types):
+        if value:
+            meal = MealType.objects.get(pk=meal_pk+1)
+            subscription.meal_type.add(meal)
+    for allergy_pk, value in enumerate(allergy_types):
+        if value:
+            allergy = Allergy.objects.get(pk=allergy_pk+1)
+            subscription.allergies.add(allergy)
+    payment = get_payment(subscription.pk, subscription.total_price)
+    return redirect(payment.confirmation.confirmation_url)
+
 
 @require_POST
 @login_required
