@@ -130,7 +130,7 @@ def create_subscription(request):
         user=request.user,
         menu_type=MenuType.objects.get(pk=menu_type),
         people_quantity=persons,
-        total_price=(meals*10+65)*persons,
+        total_price=(meals*10+65)*period,
         start_date=start_date,
         end_date=end_date,
     )
