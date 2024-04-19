@@ -1,8 +1,12 @@
 import datetime
+import json
 import random
 
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from foodplan.models import Subscription, SubscriptionMealType, Recipe, UserRecipe
 
@@ -61,3 +65,13 @@ def lk(request):
                   }
 )
 
+@require_POST
+@csrf_exempt
+@login_required
+def reaction_recipe(request):
+    data = json.loads(request.body)
+    recipe_id = data.get('recipe_id')
+    user_recipe = UserRecipe.objects.get(pk=recipe_id)
+    user_recipe.reaction = 'dislike'
+    user_recipe.save()
+    return JsonResponse({'status': 'success'})

@@ -295,3 +295,12 @@ class UserRecipe(models.Model):
 
     def get_total_people(self):
         return self.recipe.people * self.multiplier
+
+    def get_total_ingredients(self):
+        total_ingredients = []
+        for ingredient in self.recipe.recipe_ingredients.all():
+            total_ingredients.append({
+                'ingredient': ingredient.ingredient,
+                'quantity': ingredient.quantity * self.multiplier,
+            })
+        return total_ingredients

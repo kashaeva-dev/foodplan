@@ -79,3 +79,5 @@ class IngredientAdmin(admin.ModelAdmin):
 admin.site.register(MealType)
 admin.site.register(Allergy)
 admin.site.register(UserRecipe)
+admin.site.register(SubscriptionMealType)
+admin.site.register(SubscriptionAllergy)
