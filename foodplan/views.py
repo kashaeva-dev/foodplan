@@ -13,10 +13,13 @@ from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.forms.models import model_to_dict
 
 from .models import Subscription, MenuType, MealType, Allergy
 
 from foodplan.models import Subscription, SubscriptionMealType, Recipe, UserRecipe
+from .serializers import UserRecipeSerializer
+
 
 def index(request):
     return render(request,
@@ -36,10 +39,9 @@ def lk(request):
         user_dislike_recipes = UserRecipe.objects.filter(user=request.user, reaction='dislike').values_list(
             'recipe__pk', flat=True)
         for subscription in active_subscriptions:
-            user_recipes = UserRecipe.objects.filter(date=date, subscription_id=subscription.id)
+            user_recipes = UserRecipe.objects.filter(date=date, subscription_id=subscription.id, is_valid=True)
             if not user_recipes:
                 for subscription_meal_type in subscription.subscription_meal_types.all():
-                    print(subscription_meal_type)
                     meal_type = subscription_meal_type.meal_type
                     menu_type = subscription.menu_type
                     allergies = subscription.allergies.all()
@@ -48,6 +50,8 @@ def lk(request):
                         meal_type=meal_type,
                     ).exclude(
                         ingredients__allergy__in=allergies,
+                    ).exclude(
+                        pk__in=user_dislike_recipes,
                     ).exclude(
                         pk__in=user_dislike_recipes,
                     )
@@ -126,12 +130,54 @@ def create_subscription(request):
     return Response({'status': f"{period < 1} {menu_type not in range(1, 5)} {meals} {persons < 1}"})
 
 @require_POST
-@csrf_exempt
 @login_required
 def reaction_recipe(request):
     data = json.loads(request.body)
     recipe_id = data.get('recipe_id')
+    reaction = data.get('reaction')
     user_recipe = UserRecipe.objects.get(pk=recipe_id)
-    user_recipe.reaction = 'dislike'
+    user_recipe.reaction = reaction
     user_recipe.save()
     return JsonResponse({'status': 'success'})
+
+
+@require_POST
+@login_required
+def change_recipe(request):
+    data = json.loads(request.body)
+    recipe_id = data.get('recipe_id')
+    user_recipe = UserRecipe.objects.get(pk=recipe_id)
+    user_dislike_recipes = UserRecipe.objects.filter(user=request.user, reaction='dislike').values_list(
+        'recipe__pk', flat=True)
+    subscription = user_recipe.subscription
+    meal_type = user_recipe.meal_type
+    menu_type = subscription.menu_type
+    allergies = subscription.allergies.all()
+    possible_recipes = Recipe.objects.filter(
+        menu_type=menu_type,
+        meal_type=meal_type,
+    ).exclude(
+        ingredients__allergy__in=allergies,
+    ).exclude(
+        pk__in=user_dislike_recipes,
+    ).exclude(
+        pk__in=user_dislike_recipes,
+    )
+    random_recipe = random.choice(possible_recipes)
+
+    user_recipe.is_valid = False
+    user_recipe.save()
+
+    new_recipe = UserRecipe.objects.create(
+        user=request.user,
+        date=user_recipe.date,
+        meal_type=meal_type,
+        recipe=random_recipe,
+        subscription=subscription,
+        attempt=user_recipe.attempt + 1,
+        multiplier=(subscription.people_quantity + (random_recipe.people - 1)) // random_recipe.people,
+    )
+    serializer = UserRecipeSerializer(new_recipe)
+
+    return JsonResponse({'status': 'success',
+                         'new_recipe': serializer.data,})

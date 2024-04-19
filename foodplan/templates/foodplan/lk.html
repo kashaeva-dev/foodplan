@@ -162,7 +162,7 @@
                             </div>
                                 <div class="tab-pane fade show active" id="recipe">
                                     {% for user_recipe in user_recipes %}
-                                    <div class="row menu-row__container p-3">
+                                    <div class="row menu-row__container p-3 user-recipe-block" data-recipe-id="{{ user_recipe.pk }}">
                                     <div class="col-8">
                                         <div class="row">
                                             <h3 class="menu-type__header">{{ user_recipe.meal_type }}</h3>
@@ -177,9 +177,21 @@
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center mt-1">
                                             <div class="recipe__control-panel">
-                                                <i class="fa fa-heart-o color-green like-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>
-                                                <i class="fa fa-thumbs-o-down color-red dislike-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>
-                                                <i class="fa fa-refresh color-green" aria-hidden="true"></i>
+                                                {% if user_recipe.reaction == 'neutral' %}
+                                                    <i class="fa fa-heart-o color-grey like-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>
+                                                    <i class="fa fa-thumbs-o-down color-grey dislike-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>
+                                                {% elif user_recipe.reaction == 'like' %}
+                                                    <i class="fa fa-heart-o color-green like-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>
+                                                    <i class="fa fa-thumbs-o-down color-grey dislike-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>
+                                                {% elif user_recipe.reaction == 'dislike' %}
+                                                    <i class="fa fa-heart-o color-grey like-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>
+                                                    <i class="fa fa-thumbs-o-down color-red dislike-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>
+                                                {% endif %}
+                                                {% if user_recipe.attempt < 2 %}
+                                                    <i class="fa fa-refresh color-green can-refresh" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-refresh color-grey" aria-hidden="true"></i>
+                                                {% endif %}
                                             </div>
                                             <div>
                                                 <i class="fa fa-users color-green" aria-hidden="true"></i> <small class="text-muted">{{ user_recipe.get_total_people }}</small>
@@ -211,87 +223,164 @@
     </section>
 </main>
 <script>
-document.querySelectorAll('.like-button').forEach(button => {
-  button.addEventListener('click', function() {
-    const recipeId = this.getAttribute('data-recipe-id');
-    // Получение CSRF токена из cookie, нужно добавить функцию getCookie
-    const csrftoken = getCookie('csrftoken');
+document.querySelectorAll('.user-recipe-block').forEach(block => {
+    block.addEventListener('click', function(event) {
+        if (event.target.matches('.can-refresh')) {
+            const recipeId = this.getAttribute('data-recipe-id');
+            const csrftoken = getCookie('csrftoken')
 
-    fetch(`/reaction_recipe/`, {
-      method: 'POST',
-      body: JSON.stringify({
-        'recipe_id': recipeId,
-        'reaction': 'like',
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken // Добавляем CSRF токен
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json(); // Обработка JSON-ответа от сервера
-      } else {
-        throw new Error('Сетевая ошибка или ошибка сервера');
-      }
-    })
-    .then(data => {
-      if(data.status === 'success') {
-        button.style.display = 'none';
-        button.nextSibling.style.display = 'none';
-        button.nextSibling.insertAdjacentHTML('afterend', '<i class="fa fa-thumbs-o-down color-red dislike-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>');
-        button.insertAdjacentHTML('afterend', '<i class="fa fa-heart color-green" aria-hidden="true"></i>');
-      } else {
-        // Обработка ошибки, если статус в JSON не 'success'
-        console.error('Ошибка:', data.error || 'Неизвестная ошибка');
-      }
-    })
-    .catch(error => {
-      // Обработка ошибок запроса
-      console.error('Ошибка:', error);
-    });
-  });
+            fetch(`/change_recipe/`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    'recipe_id': recipeId,
+                    }),
+                headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken // Добавляем CSRF токен
+              }
+            })
+            .then(response => {
+              if (response.ok) {
+                return response.json(); // Обработка JSON-ответа от сервера
+              } else {
+                throw new Error('Сетевая ошибка или ошибка сервера');
+              }
+            })
+            .then(data => {
+              if(data.status === 'success') {
+                let user_recipe = data.new_recipe;
+                console.log(user_recipe);
+                let ingredientsHtml = ``;
+
+                for (let ing of user_recipe.total_ingredients) {
+                  ingredientsHtml += `
+                    <div class="d-flex flex-row justify-content-between">
+                      <small>${ing.name}: </small>
+                      <small>${ing.quantity !== 0 ? `${ing.quantity} гр` : 'по вкусу'}</small>
+                    </div>
+                  `;
+                }
+                let fullHtml = `<div class="row menu-row__container p-3">
+                    <div class="col-8">
+                        <div class="row">
+                            <h3 class="menu-type__header">${user_recipe.meal_type.name}</h3>
+                        </div>
+                        <h3>${user_recipe.recipe.name}</h3>
+                        <p>${user_recipe.recipe.description}</p>
+                        <p class="text-muted"><img src="${user_recipe.subscription.menu_type.image}" style="max-width: 50px;" alt="" class="w-30"> ${user_recipe.subscription.menu_type.name} меню</p>
+                    </div>
+                    <div class="col-4 text-muted d-flex flex-column justify-content-between">
+                        <div class="d-flex flex-row justify-content-between">
+                            <img src="${user_recipe.recipe.image}" alt="recipe_photo" class="w-100 recipe__photo_previw">
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <div class="recipe__control-panel">
+                                <i class="fa fa-heart-o color-grey like-button" data-recipe-id="${user_recipe.id}" aria-hidden="true"></i>
+                                <i class="fa fa-thumbs-o-down color-grey dislike-button" data-recipe-id="${user_recipe.id}" aria-hidden="true"></i>
+                                <i class="fa fa-refresh color-grey" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <i class="fa fa-users color-green" aria-hidden="true"></i> <small class="text-muted">${user_recipe.total_people}</small>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between mb-3">
+                            <small>Ингридиенты: </small>
+                        </div>
+                        ${ingredientsHtml}
+                        <div class="d-flex flex-row justify-content-between mt-3">
+                            <small>Калорийность 1 порции: </small><small>${user_recipe.recipe.total_calories_per_person} ккал</small>
+                        </div>
+                    </div>
+                </div>`
+                block.insertAdjacentHTML('afterend', fullHtml);
+                block.remove();
+                } else {
+                // Обработка ошибки, если статус в JSON не 'success'
+                console.error('Ошибка:', data.error || 'Неизвестная ошибка');
+              }
+            })
+            .catch(error => {
+              // Обработка ошибок запроса
+              console.error('Ошибка:', error);
+            });
+          }
 });
-document.querySelectorAll('.dislike-button').forEach(button => {
-  button.addEventListener('click', function() {
-    const recipeId = this.getAttribute('data-recipe-id');
-    // Получение CSRF токена из cookie, нужно добавить функцию getCookie
-    const csrftoken = getCookie('csrftoken');
+document.addEventListener('click', function(event) {
+    if (event.target.matches('.like-button')) {
+        button = event.target;
+        const recipeId = button.getAttribute('data-recipe-id');
+        // Получение CSRF токена из cookie, нужно добавить функцию getCookie
+        const csrftoken = getCookie('csrftoken');
 
-    fetch(`/reaction_recipe/`, {
-      method: 'POST',
-      body: JSON.stringify({
-        'recipe_id': recipeId,
-        'reaction': 'dislike',
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken // Добавляем CSRF токен
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json(); // Обработка JSON-ответа от сервера
-      } else {
-        throw new Error('Сетевая ошибка или ошибка сервера');
-      }
-    })
-    .then(data => {
-      if(data.status === 'success') {
-        button.style.display = 'none';
-        button.previousSibling.style.display = 'none';
-        button.previousSibling.insertAdjacentHTML('afterend', '<i class="fa fa-heart-o color-green like-button" data-recipe-id="{{ user_recipe.pk }}" aria-hidden="true"></i>');
-        button.insertAdjacentHTML('afterend', '<i class="fa fa-thumbs-down color-red" aria-hidden="true"></i>');
-      } else {
-        // Обработка ошибки, если статус в JSON не 'success'
-        console.error('Ошибка:', data.error || 'Неизвестная ошибка');
-      }
-    })
-    .catch(error => {
-      // Обработка ошибок запроса
-      console.error('Ошибка:', error);
-    });
-  });
+        fetch(`/reaction_recipe/`, {
+          method: 'POST',
+          body: JSON.stringify({
+            'recipe_id': recipeId,
+            'reaction': 'like',
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken // Добавляем CSRF токен
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json(); // Обработка JSON-ответа от сервера
+          } else {
+            throw new Error('Сетевая ошибка или ошибка сервера');
+          }
+        })
+        .then(data => {
+          if(data.status === 'success') {
+            button.style.color = '#91B93E';
+            button.nextElementSibling.style.color = '#808080';
+          } else {
+            // Обработка ошибки, если статус в JSON не 'success'
+            console.error('Ошибка:', data.error || 'Неизвестная ошибка');
+          }
+        })
+        .catch(error => {
+          // Обработка ошибок запроса
+          console.error('Ошибка:', error);
+        });
+    } else if (event.target.matches('.dislike-button')) {
+        button = event.target;
+        const recipeId = button.getAttribute('data-recipe-id');
+        // Получение CSRF токена из cookie, нужно добавить функцию getCookie
+        const csrftoken = getCookie('csrftoken');
+
+        fetch(`/reaction_recipe/`, {
+          method: 'POST',
+          body: JSON.stringify({
+            'recipe_id': recipeId,
+            'reaction': 'dislike',
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken // Добавляем CSRF токен
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json(); // Обработка JSON-ответа от сервера
+          } else {
+            throw new Error('Сетевая ошибка или ошибка сервера');
+          }
+        })
+        .then(data => {
+          if(data.status === 'success') {
+            button.style.color = '#fe9700';
+            button.previousElementSibling.style.color = '#808080';
+          } else {
+            // Обработка ошибки, если статус в JSON не 'success'
+            console.error('Ошибка:', data.error || 'Неизвестная ошибка');
+          }
+        })
+        .catch(error => {
+          // Обработка ошибок запроса
+          console.error('Ошибка:', error);
+        });
+      };
 });
 
 function getCookie(name) {
@@ -307,6 +396,6 @@ function getCookie(name) {
     }
   }
   return cookieValue;
-}
+}});
 </script>
 {% endblock %}

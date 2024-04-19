@@ -76,8 +76,15 @@ class IngredientAdmin(admin.ModelAdmin):
     ordering = ['name']
 
 
+@admin.register(UserRecipe)
+class UserRecipeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'date', 'subscription', 'meal_type', 'recipe', 'multiplier', 'reaction', 'is_valid']
+    list_filter = ['user', 'date', 'meal_type', 'reaction']
+    search_fields = ['user', 'date', 'meal_type', 'recipe', 'reaction']
+    ordering = ['date', 'meal_type', 'recipe']
+
+
 admin.site.register(MealType)
 admin.site.register(Allergy)
-admin.site.register(UserRecipe)
 admin.site.register(SubscriptionMealType)
 admin.site.register(SubscriptionAllergy)
