@@ -31,7 +31,7 @@ def get_payment(subscription_id, sum):
         },
         "confirmation": {
             "type": "redirect",
-            "return_url": "https://foodplan.alexwolf.ru/lk_stat/"
+            "return_url": "https://foodplan.alexwolf.ru/lk_test/"
         },
         "capture": True,
         "description": f"Order №{subscription_id}"
