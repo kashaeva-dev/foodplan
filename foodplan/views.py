@@ -39,6 +39,12 @@ def get_payment(subscription_id, sum):
     return payment
 
 
+@csrf_exempt
+@api_view(['POST',])
+def answer_yookassa(request):
+    return Response(status=status.HTTP_200_OK)
+
+
 def index(request):
     return render(request,
                   'foodplan/index.html',

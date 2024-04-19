@@ -9,5 +9,6 @@ urlpatterns = [
     path('subscription/', views.subscription, name='subscription'),
     path('create_subscription/', views.create_subscription,
          name='create_subscription'),
+    path('answer_yookassa', views.answer_yookassa, name='answer_yookassa')
 ]
 
