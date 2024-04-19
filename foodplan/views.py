@@ -83,7 +83,7 @@ def create_subscription(request):
     meals = 0
     for meal in meal_types:
         meals += meal
-    persons = int(request.GET.get('select5', '1'))      # кол-во человек
+    persons = int(request.GET.get('persons', '1'))      # кол-во человек
 
     allergy_types = [int(request.GET.get('allergy1', '0')),
                      int(request.GET.get('allergy2', '0')),
