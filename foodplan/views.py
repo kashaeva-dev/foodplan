@@ -71,6 +71,7 @@ def lk(request):
                     possible_recipes = Recipe.objects.filter(
                         menu_type=menu_type,
                         meal_type=meal_type,
+                        is_default=False,
                     ).exclude(
                         ingredients__allergy__in=allergies,
                     ).exclude(
@@ -78,7 +79,10 @@ def lk(request):
                     ).exclude(
                         pk__in=user_dislike_recipes,
                     )
-                    random_recipe = random.choice(possible_recipes)
+                    if possible_recipes:
+                        random_recipe = random.choice(possible_recipes)
+                    else:
+                        random_recipe = Recipe.objects.filter(is_default=True).first()
 
                     new_recipe = UserRecipe.objects.create(
                         user=request.user,
@@ -91,6 +95,14 @@ def lk(request):
                     total_user_recipes.append(new_recipe)
             else:
                 total_user_recipes += user_recipes
+    products_list = []
+    if total_user_recipes:
+        for user_recipe in total_user_recipes:
+            for ingredient in user_recipe.get_total_ingredients():
+                ing_dict = {}
+                if ingredient['ingredient'].name in ing_dict:
+                    ing_dict[ingredient['ingredient'].name] += ingredient['quantity']
+
 
     return render(request, 'foodplan/lk.html',
                   context={
@@ -189,7 +201,10 @@ def change_recipe(request):
     ).exclude(
         pk__in=user_dislike_recipes,
     )
-    random_recipe = random.choice(possible_recipes)
+    if possible_recipes:
+        random_recipe = random.choice(possible_recipes)
+    else:
+        random_recipe = Recipe.objects.filter(is_default=True).first()
 
     user_recipe.is_valid = False
     user_recipe.save()

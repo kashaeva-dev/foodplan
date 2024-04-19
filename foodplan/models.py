@@ -79,6 +79,7 @@ class Recipe(models.Model):
                                   through='MealTypeRecipe',
                                   )
     people = models.IntegerField(verbose_name='Количество порций', default=1)
+    is_default = models.BooleanField(verbose_name='По умолчанию', default=False)
 
     class Meta:
         verbose_name = 'Рецепт'
