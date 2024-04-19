@@ -29,6 +29,9 @@ SECRET_KEY = env.str('SECRET_KEY', 'django-insecure-k5s5kv4h!b3=r!a*_v)4w=+i40*5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', False)
 
+YOOKASSA_SHOP_ID = env.str('YOOKASSA_SHOP_ID')
+YOOKASSA_API_KEY = env.str('YOOKASSA_API_KEY') 
+
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", [])
 
