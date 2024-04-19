@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="card col-12 col-md-10 p-3 mb-3 foodplan__shadow">
-                        <ul class="nav nav-tabs">
+                    <ul class="nav nav-tabs">
                             {% if active_subscriptions %}
                                 <li class="nav-item foodplan__tab-item">
                                     <button id="tab1" class="btn shadow-none foodplan__tab-button {% if active_subscriptions %} active {% endif %}" data-bs-toggle="tab" data-bs-target="#recipe">Рецепты на сегодня</button>
@@ -48,7 +48,7 @@
                             </li>
                             <li class="nav-item foodplan__tab-item flex-grow-1"></li>
                         </ul>
-                        <div class="tab-content mt-2">
+                    <div class="tab-content mt-2">
                             <div class="tab-pane fade" id="data">
                                 <form action="">
                                     <div class="mb-3">
@@ -161,24 +161,19 @@
                                 </div>
                             </div>
                                 <div class="tab-pane fade show active" id="recipe">
-                                <div class="row menu-row__container p-3">
+                                    {% for user_recipe in user_recipes %}
+                                    <div class="row menu-row__container p-3">
                                     <div class="col-8">
                                         <div class="row">
-                                            <h3 class="menu-type__header">Завтрак</h3>
+                                            <h3 class="menu-type__header">{{ user_recipe.meal_type }}</h3>
                                         </div>
-                                        <h3>Название блюда 1</h3>
-                                        <p>Описание блюда Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis necessitatibus
-                                            consectetur rem! Eligendi assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae
-                                            distinctio cum laboriosam sed. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis
-                                            necessitatibus consectetur rem! Eligendi
-                                            assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae distinctio cum laboriosam
-                                            sed.
-                                        </p>
-                                        <p class="text-muted"><img src="{% static 'img/menu_classical.png' %}" style="max-width: 50px;" alt="" class="w-30"> Классическое меню</p>
+                                        <h3>{{ user_recipe.recipe.name }}</h3>
+                                        <p>{{ user_recipe.recipe.description }}</p>
+                                        <p class="text-muted"><img src="{{ user_recipe.subscription.menu_type.image.url }}" style="max-width: 50px;" alt="" class="w-30"> {{ user_recipe.subscription.menu_type.name }} меню</p>
                                     </div>
                                     <div class="col-4 text-muted d-flex flex-column justify-content-between">
                                         <div class="d-flex flex-row justify-content-between">
-                                            <img src="{% static 'img/1.jpg' %}" alt="recipe_photo" class="w-100 recipe__photo_previw">
+                                            <img src="{{ user_recipe.recipe.image.url }}" alt="recipe_photo" class="w-100 recipe__photo_previw">
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center mt-1">
                                             <div class="recipe__control-panel">
@@ -187,86 +182,29 @@
                                                 <i class="fa fa-refresh color-green" aria-hidden="true"></i>
                                             </div>
                                             <div>
-                                                <i class="fa fa-users color-green" aria-hidden="true"></i> <small class="text-muted">6</small>
+                                                <i class="fa fa-users color-green" aria-hidden="true"></i> <small class="text-muted">{{ user_recipe.get_total_people }}</small>
                                             </div>
                                         </div>
                                         <div class="d-flex flex-row justify-content-between mb-3">
                                             <small>Ингридиенты: </small>
                                         </div>
                                         <div class="ingredients-container">
-                                            <div class="d-flex flex-row justify-content-between">
-                                                <small>Картофель: </small><small>550 гр</small>
-                                            </div>
-                                            <div class="d-flex flex-row justify-content-between">
-                                                <small>Морковь: </small><small>100 гр</small>
-                                            </div>
-                                            <div class="d-flex flex-row justify-content-between">
-                                                <small>Масло растительное: </small><small>20 гр</small>
-                                            </div>
-                                            <div class="d-flex flex-row justify-content-between">
-                                                <small>Соль: </small><small>по вкусу</small>
-                                            </div>
+                                            {% for ingredient in user_recipe.recipe.recipe_ingredients.all %}
+                                                <div class="d-flex flex-row justify-content-between">
+                                                    <small>{{ ingredient.ingredient.name }}: </small><small> {% if ingredient.quantity != 0 %}
+                                                    {{ ingredient.quantity }} гр {% else %} по вкусу {% endif %}</small>
+                                                </div>
+                                            {% endfor %}
                                         </div>
                                         <div class="d-flex flex-row justify-content-between mt-3">
-                                            <small>Калорийность 1 порции: </small><small>250 ккал</small>
+                                            <small>Калорийность 1 порции: </small><small>{{ user_recipe.recipe.get_total_calories_per_person }} ккал</small>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row menu-row__container p-3">
-                                    <div class="col-8">
-                                        <div class="row">
-                                            <h3 class="menu-type__header">Обед</h3>
-                                        </div>
-                                        <h3>Название блюда 2</h3>
-                                        <p>Описание блюда Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis necessitatibus
-                                            consectetur rem! Eligendi assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae
-                                            distinctio cum laboriosam sed. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius saepe ea nobis
-                                            necessitatibus consectetur rem! Eligendi
-                                            assumenda facere sint quibusdam dolorem quasi doloribus nemo, temporibus molestiae distinctio cum laboriosam
-                                            sed.
-                                        </p>
-                                        <p class="text-muted"><img src="{% static 'img/menu_classical.png' %}" style="max-width: 50px;" alt="" class="w-30"> Классическое меню</p>
-                                    </div>
-                                    <div class="col-4 text-muted d-flex flex-column justify-content-between">
-                                        <div class="d-flex flex-row justify-content-between">
-                                            <img src="{% static 'img/1.jpg' %}" alt="recipe_photo" class="w-100 recipe__photo_previw">
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center mt-1">
-                                            <div class="recipe__control-panel">
-                                                <i class="fa fa-heart-o color-green" aria-hidden="true"></i>
-                                                <i class="fa fa-thumbs-o-down color-red" aria-hidden="true"></i>
-                                                <i class="fa fa-refresh color-green" aria-hidden="true"></i>
-                                            </div>
-                                            <div>
-                                                <i class="fa fa-users color-green" aria-hidden="true"></i> <small class="text-muted">6</small>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex flex-row justify-content-between mb-3">
-                                            <small>Ингридиенты: </small>
-                                        </div>
-                                        <div class="ingredients-container">
-                                            <div class="d-flex flex-row justify-content-between">
-                                                <small>Картофель: </small><small>550 гр</small>
-                                            </div>
-                                            <div class="d-flex flex-row justify-content-between">
-                                                <small>Морковь: </small><small>100 гр</small>
-                                            </div>
-                                            <div class="d-flex flex-row justify-content-between">
-                                                <small>Масло растительное: </small><small>20 гр</small>
-                                            </div>
-                                            <div class="d-flex flex-row justify-content-between">
-                                                <small>Соль: </small><small>по вкусу</small>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex flex-row justify-content-between mt-3">
-                                            <small>Калорийность 1 порции: </small><small>250 ккал</small>
-                                        </div>
-                                    </div>
+                                {% endfor %}
                                 </div>
-                            </div>
                             {% endif %}
                         </div>
-
                 </div>
             </div>
         </div>

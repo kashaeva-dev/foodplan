@@ -100,7 +100,7 @@ class Recipe(models.Model):
                                                 for ingredient_item in self.recipe_ingredients.all()])
 
     def get_total_calories_per_person(self):
-        return self.get_total_calories() / self.people
+        return int(self.get_total_calories() / self.people)
 
 
 class RecipeIngredient(models.Model):
@@ -165,6 +165,11 @@ class MenuTypeRecipe(models.Model):
 
 
 class Subscription(models.Model):
+    PAYMENT_STATUS_CHOICES = (
+        ('waiting_for_payment', 'Ожидает оплаты'),
+        ('paid', 'Оплачено'),
+        ('canceled', 'Отменено'),
+    )
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.PROTECT,
                              verbose_name='Пользователь',
@@ -189,6 +194,11 @@ class Subscription(models.Model):
     total_price = models.DecimalField(max_digits=8,
                                       decimal_places=2,
                                       verbose_name='Стоимость, руб.',
+                                      )
+    payment_status = models.CharField(max_length=20,
+                                      verbose_name='Статус оплаты',
+                                      choices=PAYMENT_STATUS_CHOICES,
+                                      default='waiting_for_payment',
                                       )
     start_date = models.DateField(verbose_name='Дата начала')
     end_date = models.DateField(verbose_name='Дата окончания')
@@ -282,3 +292,6 @@ class UserRecipe(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.recipe}'
+
+    def get_total_people(self):
+        return self.recipe.people * self.multiplier

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from foodplan.models import MealType, Allergy, Ingredient, MenuType, Recipe, RecipeIngredient, MealTypeRecipe, \
-    MenuTypeRecipe, SubscriptionMealType, Subscription, SubscriptionAllergy
+    MenuTypeRecipe, SubscriptionMealType, Subscription, SubscriptionAllergy, UserRecipe
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -78,3 +78,4 @@ class IngredientAdmin(admin.ModelAdmin):
 
 admin.site.register(MealType)
 admin.site.register(Allergy)
+admin.site.register(UserRecipe)
