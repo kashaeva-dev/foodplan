@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from foodplan.models import MealType, Allergy, Ingredient, MenuType, Recipe, RecipeIngredient, MealTypeRecipe, \
-    MenuTypeRecipe, SubscriptionMealType, Subscription, SubscriptionAllergy, UserRecipe
+    MenuTypeRecipe, SubscriptionMealType, Subscription, SubscriptionAllergy, UserRecipe, Unit
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -44,10 +44,15 @@ class RecipeAdmin(admin.ModelAdmin):
                MealTypeRecipeInline,
                MenuTypeRecipeInline,
                )
-    list_display = ('name',
-                    'total_calories_per_person_display',
-                    'total_weight_per_person_display',
-                    )
+    list_display = (
+        'preview',
+        'name',
+        'total_calories_per_person_display',
+        'total_weight_per_person_display',
+        )
+
+    def preview(self, obj):
+        return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px;">')
 
     def total_calories_per_person_display(self, obj):
         return int(obj.get_total_calories_per_person())
@@ -69,8 +74,8 @@ class MenuTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ['name', 'protein', 'fat', 'carbohydrate', 'energy', 'allergy']
-    list_editable = ['protein', 'fat', 'carbohydrate', 'energy', 'allergy']
+    list_display = ['name', 'energy', 'allergy', 'unit', 'mass']
+    list_editable = ['energy', 'allergy', 'unit', 'mass']
     list_filter = ['allergy']
     search_fields = ['name']
     ordering = ['name']
@@ -88,3 +93,4 @@ admin.site.register(MealType)
 admin.site.register(Allergy)
 admin.site.register(SubscriptionMealType)
 admin.site.register(SubscriptionAllergy)
+admin.site.register(Unit)

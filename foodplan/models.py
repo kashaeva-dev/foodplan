@@ -24,6 +24,17 @@ class Allergy(models.Model):
         return self.name
 
 
+class Unit(models.Model):
+    name = models.CharField(max_length=40, verbose_name='Единица измерения')
+
+    class Meta:
+        verbose_name = 'Единица измерения'
+        verbose_name_plural = 'Единицы измерения'
+
+    def __str__(self):
+        return self.name
+
+
 class Ingredient(models.Model):
     name = models.CharField(max_length=40, verbose_name='Ингредиент')
     allergy = models.ForeignKey(Allergy,
@@ -36,6 +47,13 @@ class Ingredient(models.Model):
     protein = models.FloatField(verbose_name='Белки, г', default=0)
     fat = models.FloatField(verbose_name='Жиры, г', default=0)
     carbohydrate = models.FloatField(verbose_name='Углеводы, г', default=0)
+    unit = models.ForeignKey(Unit,
+                            on_delete=models.PROTECT,
+                            verbose_name='Единица измерения',
+                            related_name='ingredients',
+                            default=1,
+                            )
+    mass = models.IntegerField(verbose_name='Масса, г', default=1)
     energy = models.IntegerField(verbose_name='Калорийность, ккал')
 
     class Meta:
@@ -89,15 +107,15 @@ class Recipe(models.Model):
         return self.name
 
     def get_total_weight_per_person(self):
-        return sum([ingredient_item.quantity
+        return sum([ingredient_item.quantity * ingredient_item.ingredient.mass
              for ingredient_item in self.recipe_ingredients.all()]) / self.people
 
     def get_total_calories(self):
-        return sum([ingredient_item.quantity * (ingredient_item.ingredient.energy / 100)
+        return sum([ingredient_item.quantity * ingredient_item.ingredient.mass * (ingredient_item.ingredient.energy / 100)
                     for ingredient_item in self.recipe_ingredients.all()])
 
     def get_total_calories_per_100(self):
-        return self.get_total_calories() / sum([ingredient_item.quantity
+        return self.get_total_calories() / sum([ingredient_item.quantity * ingredient_item.ingredient.mass
                                                 for ingredient_item in self.recipe_ingredients.all()])
 
     def get_total_calories_per_person(self):
@@ -303,5 +321,6 @@ class UserRecipe(models.Model):
             total_ingredients.append({
                 'ingredient': ingredient.ingredient,
                 'quantity': ingredient.quantity * self.multiplier,
+                'unit': ingredient.ingredient.unit,
             })
         return total_ingredients

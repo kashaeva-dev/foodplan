@@ -105,20 +105,26 @@ def lk(request):
                     total_user_recipes.append(new_recipe)
             else:
                 total_user_recipes += user_recipes
-    products_list = []
+    sorted_total_user_recipes = sorted(total_user_recipes, key=lambda user_recipe: (user_recipe.subscription.pk,
+                                                                                    user_recipe.meal_type.pk))
+    ing_dict = {}
     if total_user_recipes:
         for user_recipe in total_user_recipes:
             for ingredient in user_recipe.get_total_ingredients():
-                ing_dict = {}
+                if ingredient['ingredient'].name == 'Вода' or ingredient['quantity'] == 0:
+                    continue
                 if ingredient['ingredient'].name in ing_dict:
-                    ing_dict[ingredient['ingredient'].name] += ingredient['quantity']
-
+                    ing_dict[ingredient['ingredient'].name]['quantity'] += ingredient['quantity']
+                else:
+                    ing_dict[ingredient['ingredient'].name] = {'quantity': ingredient['quantity'],
+                                                               'unit': ingredient['unit'].name}
 
     return render(request, 'foodplan/lk.html',
                   context={
                       'active_subscriptions': active_subscriptions,
                       'username': request.user.username,
-                      'user_recipes': total_user_recipes,
+                      'user_recipes': sorted_total_user_recipes,
+                        'ing_dict': ing_dict,
                   }
                   )
 

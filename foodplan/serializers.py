@@ -1,9 +1,18 @@
 from rest_framework.serializers import ModelSerializer, CharField, IntegerField, FloatField, SerializerMethodField
 
-from .models import UserRecipe, Recipe, Subscription, SubscriptionMealType, Allergy, MenuType, MealType, Ingredient
+from .models import UserRecipe, Recipe, Subscription, SubscriptionMealType, Allergy, MenuType, MealType, Ingredient, \
+    Unit
+
+
+class UnitSerializer(ModelSerializer):
+    class Meta:
+        model = Unit
+        fields = '__all__'
 
 
 class IngredientSerializer(ModelSerializer):
+    unit_name = CharField(source='unit.name', read_only=True)
+
     class Meta:
         model = Ingredient
         fields = '__all__'

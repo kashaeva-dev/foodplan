@@ -152,11 +152,9 @@
                                 <div class="col-12 col-sm-6 p-3">
                                     <small class="link-secondary">Ингредиенты:</small>
                                     <ul class="list-group list-group-flush">
-                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
-                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
-                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
-                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
-                                        <li class="list-group-item disabled"><small>ингредиент (500г.)</small></li>
+                                        {% for key, value in ing_dict.items %}
+                                        <li class="list-group-item disabled"><small>{{ key }} - {{ value.quantity }} {{ value.unit}}</small></li>
+                                        {% endfor %}
                                     </ul>
                                 </div>
                             </div>
@@ -204,7 +202,7 @@
                                             {% for ingredient in user_recipe.get_total_ingredients %}
                                                 <div class="d-flex flex-row justify-content-between">
                                                     <small>{{ ingredient.ingredient.name }}: </small><small> {% if ingredient.quantity != 0 %}
-                                                    {{ ingredient.quantity }} гр {% else %} по вкусу {% endif %}</small>
+                                                    {{ ingredient.quantity }} {{ ingredient.ingredient.unit }} {% else %} по вкусу {% endif %}</small>
                                                 </div>
                                             {% endfor %}
                                         </div>
@@ -256,7 +254,7 @@ document.querySelectorAll('.user-recipe-block').forEach(block => {
                   ingredientsHtml += `
                     <div class="d-flex flex-row justify-content-between">
                       <small>${ing.name}: </small>
-                      <small>${ing.quantity !== 0 ? `${ing.quantity} гр` : 'по вкусу'}</small>
+                      <small>${ing.quantity !== 0 ? `${ing.quantity} ${ing.unit_name}` : 'по вкусу'}</small>
                     </div>
                   `;
                 }
