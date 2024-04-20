@@ -47,7 +47,7 @@ def answer_yookassa(request):
 
 def index(request):
     recipes = []
-    all_pk = [pk for pk in range(Recipe.objects.count())]
+    all_pk = list(Recipe.objects.all().values_list('pk', flat=True))
     random.shuffle(all_pk)
     for i, pk in enumerate(all_pk[:5]):
         recipe = Recipe.objects.get(pk=pk)
@@ -124,8 +124,9 @@ def lk(request):
 
 
 def recipe(request):
-    rnd = int(random.random() * Recipe.objects.count() + .5)
-    recipe_id = int(request.GET.get('recipe', rnd))
+    all_pk = list(Recipe.objects.all().values_list('pk', flat=True))
+    random.shuffle(all_pk)
+    recipe_id = int(request.GET.get('recipe', all_pk[0]))
     recipe = Recipe.objects.get(pk=recipe_id)
     ingredients = recipe.recipe_ingredients.values_list(
         'quantity', 'ingredient__name', 'ingredient__energy'
