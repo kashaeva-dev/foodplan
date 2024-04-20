@@ -14,7 +14,12 @@
                         Вы получаете рецепты + список продуктов.<br>
                         Больше не нужно думать, что готовить.</h4>
                     <div class="d-block mt-3">
-                        <button class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Хочу попробовать</button>
+                        <a href="recipe/" class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Хочу попробовать</a>
+                        {% if user.is_authenticated %}
+                        <a href="subscription/" class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Хочу заказать</a>
+                        {% else %}
+                        <a href="{% url 'account:auth' %}" class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Войти</a>а
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -60,7 +65,16 @@
             <div class="container w-md-75">
                 <div id="carousel1" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                        <div class="carousel-item active">
+                        {% for order, pk, image, description, name in recipes %}
+                        <a href="recipe/?recipe={{ pk }}" class="carousel-item {% if not order %}active{% endif %}">
+                            <img src="{{ image }}" class="d-block w-100" alt="">
+                            <div class="card-img-overlay text-white text-center carousel-item__gradient">
+                                <h5><b>{{ description }}</b></h5>
+                                <h2><b>{{ name }}</b></h2>
+                            </div>
+                        </a>
+                        {% endfor %}
+                        <!-- <div class="carousel-item active">
                             <img src="{% static 'img/1.jpg' %}" class="d-block w-100" alt="boul_foto">
                             <div class="card-img-overlay text-white text-center carousel-item__gradient">
                                 <h5><b>Модный и полезный ужин</b></h5>
@@ -95,7 +109,7 @@
                                 <h5><b>Который все пекут повторно</b></h5>
                                 <h2><b>Брауни чизкейк с ягодами</b></h2>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <button class="carousel-control-prev carousel__button_prev" type="button" data-bs-target="#carousel1"
                         data-bs-slide="prev">

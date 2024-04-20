@@ -1,6 +1,7 @@
 import datetime
 import json
 import random
+import re
 import uuid
 
 from django.conf import settings
@@ -45,9 +46,18 @@ def answer_yookassa(request):
 
 
 def index(request):
-    return render(request,
-                  'foodplan/index.html',
-                  )
+    recipes = []
+    all_pk = [pk for pk in range(Recipe.objects.count())]
+    random.shuffle(all_pk)
+    for i, pk in enumerate(all_pk[:5]):
+        recipe = Recipe.objects.get(pk=pk)
+        recipes.append((i, recipe.pk, recipe.image.url,
+                        re.match(r'.*?[.!]', recipe.description)[0],
+                        recipe.name, ))
+
+    return render(request, 'foodplan/index.html',
+                  context={'recipes': recipes}
+                 )
 
 
 @login_required
