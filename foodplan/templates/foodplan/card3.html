@@ -13,23 +13,29 @@
             <div class="row">
                 <div class="col-12 col-md-4 d-flex justify-content-center">
                     <div class="card foodplan__card_borderless">
-                        <img src="{{ image }}" alt="">
+                        <img src="{{ image }}" alt="" class="recipe__photo_previw max-w-75">
                     </div>
                 </div>
                 <div class="col-12 col-md-8 d-flex flex-column justify-content-between">
                     <div class="row">
                         <h2>{{ name }}</h2>
                         <div class="col-12 col-sm-6">
-                            <h6>{{ description }}</h6>
+                            <p>{{ description }}</p>
                         </div>
                         <div class="col-12 col-sm-6">
                             <small class="link-secondary">Ингредиенты:</small>
                             <ul class="list-group list-group-flush">
-                                {% for quantity, name, _ in ingredients %}
-                                <li class="list-group-item disabled"><small>{{ name }} ({{ quantity }}г.)</small></li>
+                                {% for quantity, name, unit in ingredients %}
+                                <li class="list-group-item disabled"><small>
+                                    {% if quantity != 0 %}
+                                        {{ name }} - {{ quantity }} {{ unit }}
+                                    {% else %}
+                                        {{name }} - по вкусу
+                                    {% endif %}
+                                </small></li>
                                 {% endfor %}
                             </ul>
-                            <small class="link-secondary">Общая калорийность: {{ total_energy }} ккал</small>
+                            <small class="link-secondary">Калорийность на 100 г: {{ total_energy }} ккал</small>
                         </div>
                     </div>
                 </div>

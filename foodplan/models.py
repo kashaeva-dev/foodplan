@@ -115,8 +115,8 @@ class Recipe(models.Model):
                     for ingredient_item in self.recipe_ingredients.all()])
 
     def get_total_calories_per_100(self):
-        return self.get_total_calories() / sum([ingredient_item.quantity * ingredient_item.ingredient.mass
-                                                for ingredient_item in self.recipe_ingredients.all()])
+        return (self.get_total_calories() / (sum([ingredient_item.quantity * ingredient_item.ingredient.mass
+                                                for ingredient_item in self.recipe_ingredients.all()]))) * 100
 
     def get_total_calories_per_person(self):
         return int(self.get_total_calories() / self.people)

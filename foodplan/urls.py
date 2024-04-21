@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='start_page'),
-    path('lk_test/', views.lk, name='lk_test'),
+    path('lk/', views.lk, name='lk'),
     path('recipe/', views.recipe, name='recipe'),
     path('reaction_recipe/', views.reaction_recipe, name='reaction_recipe'),
     path('change_recipe/', views.change_recipe, name='change_recipe'),

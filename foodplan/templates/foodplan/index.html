@@ -14,9 +14,9 @@
                         Вы получаете рецепты + список продуктов.<br>
                         Больше не нужно думать, что готовить.</h4>
                     <div class="d-block mt-3">
-                        <a href="recipe/" class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Хочу попробовать</a>
+                        <a href="recipe/" class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Случайный рецепт</a>
                         {% if user.is_authenticated %}
-                        <a href="subscription/" class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Хочу заказать</a>
+                        <a href="subscription/" class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Подписка</a>
                         {% else %}
                         <a href="{% url 'account:auth' %}" class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Войти</a>
                         {% endif %}

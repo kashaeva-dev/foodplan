@@ -47,7 +47,7 @@ def answer_yookassa(request):
 
 def index(request):
     recipes = []
-    all_pk = list(Recipe.objects.all().values_list('pk', flat=True))
+    all_pk = list(Recipe.objects.filter(is_default=False).values_list('pk', flat=True))
     random.shuffle(all_pk)
     for i, pk in enumerate(all_pk[:5]):
         recipe = Recipe.objects.get(pk=pk)
@@ -63,7 +63,8 @@ def index(request):
 @login_required
 def lk(request):
     active_subscriptions = request.user.subscriptions.filter(
-        end_date__gte=datetime.date.today()
+        end_date__gte=datetime.date.today(),
+        payment_status='paid',
     )
 
     total_user_recipes = []
@@ -130,22 +131,21 @@ def lk(request):
 
 
 def recipe(request):
-    all_pk = list(Recipe.objects.all().values_list('pk', flat=True))
+    all_pk = list(Recipe.objects.filter(is_default=False).values_list('pk', flat=True))
     random.shuffle(all_pk)
     recipe_id = int(request.GET.get('recipe', all_pk[0]))
     recipe = Recipe.objects.get(pk=recipe_id)
     ingredients = recipe.recipe_ingredients.values_list(
-        'quantity', 'ingredient__name', 'ingredient__energy'
+        'quantity', 'ingredient__name', 'ingredient__unit__name'
     )
-    total_energy = 0
-    for  _, _, energy in ingredients:
-        total_energy += energy
+    total_energy_per_100g = int(recipe.get_total_calories_per_100())
+
     context = {
         'name': recipe.name,
         'description': recipe.description,
         'image': recipe.image.url,
         'ingredients': ingredients,
-        'total_energy': total_energy,
+        'total_energy': total_energy_per_100g,
     }
     return render(request, 'foodplan/card3.html', context = context)
 

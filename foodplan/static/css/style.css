@@ -291,3 +291,6 @@ body {
 .color-grey {
     color: #808080;
 }
+.max-w-75 {
+    max-width: 75px;
+}
