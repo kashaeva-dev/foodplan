@@ -7,7 +7,7 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from rest_framework import status
@@ -31,7 +31,7 @@ def get_payment(subscription_id, sum):
         },
         "confirmation": {
             "type": "redirect",
-            "return_url": "https://foodplan.alexwolf.ru/lk_test/"
+            "return_url": f"https://foodplan.alexwolf.ru{reverse('lk')}"
         },
         "capture": True,
         "description": f"Order №{subscription_id}"
