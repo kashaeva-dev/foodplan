@@ -181,7 +181,7 @@ def create_subscription(request):
 
     if ((period < 1) or (menu_type not in range(1, 5)) or (not meals)
         or (persons < 1)):
-        return redirect({'Error': 'Wrong data input'})
+        return redirect(reverse('subscription'))
     
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=period*30)
@@ -195,7 +195,7 @@ def create_subscription(request):
         payment_status='paid',
     )
     if not created:
-        return redirect({'Error': 'Not created'})
+        return redirect(reverse('lk'))
 
     for meal_pk, value in enumerate(meal_types):
         if value:
