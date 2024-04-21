@@ -34,7 +34,7 @@ def get_payment(subscription_id, sum):
             "return_url": f"https://foodplan.alexwolf.ru{reverse('lk')}"
         },
         "capture": True,
-        "description": f"Order №{subscription_id}"
+        "description": f"{subscription_id}"
     }, uuid.uuid4())
     return payment
 
@@ -42,6 +42,9 @@ def get_payment(subscription_id, sum):
 @csrf_exempt
 @api_view(['POST',])
 def answer_yookassa(request):
+    payment_object = request.data.get('object', {})
+    if not payment_object:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_200_OK)
 
 
@@ -189,6 +192,7 @@ def create_subscription(request):
         total_price=(meals*10+65)*period,
         start_date=start_date,
         end_date=end_date,
+        payment_status='paid',
     )
     if not created:
         return redirect({'Error': 'Not created'})
