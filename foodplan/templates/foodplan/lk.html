@@ -4,7 +4,9 @@
     <title>Foodplan 2021 - Меню на неделю FOODPLAN</title>
 {% endblock %}
 {% block nav_button %}
-<button class="btn btn-outline-success shadow-none foodplan_green foodplan__border_green">Выйти</button>
+<button onclick="window.location.href = '{% url 'account:logout' %}'"
+        class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Выйти
+</button>
 {% endblock %}
 {% block content %}
 <main style="margin-top: calc(2rem + 85px);">
@@ -26,7 +28,9 @@
                     </div>
                     <h3 class="card-title text-center">{{ username }}</h3>
                     <div class="d-block">
-                        <button class="btn btn-outline-success shadow-none foodplan_green foodplan__border_green">Выйти</button>
+                        <button onclick="window.location.href = '{% url 'account:logout' %}'"
+                            class="btn shadow-none btn-outline-success foodplan_green foodplan__border_green">Выйти
+                        </button>
                     </div>
                 </div>
 

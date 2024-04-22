@@ -15,4 +15,3 @@ class LoginUser(LoginView):
     form_class = AuthorizationUserForm
     template_name = 'foodplan/auth.html'
 
-
